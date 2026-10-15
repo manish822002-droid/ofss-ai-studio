@@ -1,81 +1,16 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A simple free text-to-speech tool that reads your text aloud in your browser.">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OFSS AI Studio — Text to Speech</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2e;--panel2:#18233b;--text:#edf2ff;--muted:#a8b4d0;--accent:#7c9cff;--accent2:#a78bfa;--border:#2a3857}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(ellipse at top,#1a2750 0,#0b1020 55%);color:var(--text);min-height:100vh}
-.wrap{max-width:980px;margin:auto;padding:28px 18px 48px}.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:44px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#10162a;font-size:20px}.pill{border:1px solid var(--border);border-radius:99px;padding:7px 11px;color:var(--muted);font-size:12px}
-.hero{text-align:center;margin-bottom:28px}.eyebrow{color:#b6c4ff;text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:800}.hero h1{font-size:clamp(32px,5vw,54px);line-height:1.06;margin:12px 0}.hero p{max-width:650px;margin:0 auto;color:var(--muted);font-size:16px;line-height:1.65}
-.card{background:rgba(18,26,46,.92);border:1px solid var(--border);border-radius:22px;padding:clamp(18px,3vw,30px);box-shadow:0 20px 70px #0003}
-label{display:block;font-size:13px;font-weight:700;margin-bottom:9px;color:#d9e2ff}textarea,select,input[type=range]{width:100%}textarea,select{background:#0d1528;border:1px solid var(--border);color:var(--text);border-radius:12px;padding:13px;font:inherit}textarea{min-height:220px;resize:vertical;line-height:1.6}textarea:focus,select:focus{outline:2px solid #7c9cff88;border-color:var(--accent)}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.field{min-width:0}.rangehead{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);margin-bottom:9px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}button{border:0;border-radius:12px;padding:12px 17px;font:inherit;font-weight:750;cursor:pointer;transition:transform .12s,opacity .12s}button:active{transform:scale(.98)}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#10162a}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border)}.status{min-height:24px;color:#b8c6ff;font-size:13px;margin-top:14px}.notice{margin-top:22px;padding:14px 16px;border:1px solid #5c4b25;background:#2b2416;border-radius:13px;color:#f5deb0;font-size:13px;line-height:1.6}.below{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.mini{background:#111a2c;border:1px solid var(--border);padding:17px;border-radius:16px}.mini b{display:block;margin-bottom:7px}.mini p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}
-@media(max-width:650px){.row,.below{grid-template-columns:1fr}.nav{margin-bottom:30px}.hero{margin-bottom:22px}.actions button{flex:1}}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header class="nav">
-    <div class="brand"><div class="logo">◖))</div><span>OFSS AI Studio</span></div>
-    <span class="pill">Free browser demo</span>
-  </header>
-  <section class="hero">
-    <div class="eyebrow">Text to Speech</div>
-    <h1>Turn your text into speech.</h1>
-    <p>Paste or type your script, choose an available voice, and listen instantly. This starter version runs in your browser—no account or API key required.</p>
-  </section>
-  <main class="card">
-    <label for="text">Your text</label>
-    <textarea id="text" maxlength="10000" placeholder="Type or paste your script here…">Welcome to OFSS AI Studio. Write your text, choose a voice, and press Play to hear it spoken aloud.</textarea>
-    <div class="rangehead" style="margin-top:8px"><span id="count">0 / 10000 characters</span><span>Tip: shorter paragraphs work best.</span></div>
-    <div class="row">
-      <div class="field"><label for="voice">Voice</label><select id="voice"><option>Loading available voices…</option></select></div>
-      <div class="field"><label for="rate">Speaking speed <span id="rateValue">1.0×</span></label><input id="rate" type="range" min="0.6" max="1.4" value="1" step="0.1"></div>
-      <div class="field"><label for="pitch">Voice pitch <span id="pitchValue">1.0×</span></label><input id="pitch" type="range" min="0.7" max="1.3" value="1" step="0.1"></div>
-      <div class="field"><label for="langfilter">Filter voices by language</label><select id="langfilter"><option value="all">All languages</option><option value="en">English</option><option value="hi">Hindi</option><option value="en-US">English (United States)</option><option value="en-GB">English (United Kingdom)</option></select></div>
-    </div>
-    <div class="actions">
-      <button class="primary" id="play">▶ Play speech</button>
-      <button class="secondary" id="pause">Ⅱ Pause</button>
-      <button class="secondary" id="resume">▶ Resume</button>
-      <button class="secondary" id="stop">■ Stop</button>
-    </div>
-    <div class="status" id="status" role="status" aria-live="polite">Loading voices…</div>
-    <div class="notice"><b>Important:</b> This free starter plays speech using voices installed in the visitor’s browser/device. It does not create an MP3/WAV download. Downloadable audio and server-side AI voices require a separate TTS backend or service, which may have usage limits or costs.</div>
-  </main>
-  <section class="below">
-    <div class="mini"><b>🔒 No API key</b><p>Text is passed to your browser’s speech engine, not to a key embedded in this website.</p></div>
-    <div class="mini"><b>🌍 Multiple voices</b><p>Available languages depend on the browser, operating system, and installed voices.</p></div>
-    <div class="mini"><b>📱 Responsive</b><p>The page works on desktop and mobile browsers that support speech synthesis.</p></div>
-  </section>
-  <footer>OFSS AI Studio · Free starter demo · Add a privacy policy before public promotion.</footer>
-</div>
-<script>
-const textEl=document.getElementById('text'),voiceEl=document.getElementById('voice'),filterEl=document.getElementById('langfilter');
-const rateEl=document.getElementById('rate'),pitchEl=document.getElementById('pitch'),statusEl=document.getElementById('status');
-const synth=window.speechSynthesis;let voices=[];
-function count(){document.getElementById('count').textContent=`${textEl.value.length} / 10000 characters`}
-function filteredVoices(){const f=filterEl.value;return voices.filter(v=>f==='all'||(f.length===2?v.lang.toLowerCase().startsWith(f.toLowerCase()):v.lang.toLowerCase()===f.toLowerCase()))}
-function populate(){voices=synth?synth.getVoices():[];const old=voiceEl.value;const list=filteredVoices();voiceEl.innerHTML='';
- if(!list.length){const o=document.createElement('option');o.value='';o.textContent='No matching voices found';voiceEl.appendChild(o);statusEl.textContent=voices.length?'No voices match this filter. Try All languages.':'No browser voices found. Try another browser/device.';return}
- list.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} — ${v.lang}${v.default?' (default)':''}`;voiceEl.appendChild(o)});
- if([...voiceEl.options].some(o=>o.value===old))voiceEl.value=old;
- statusEl.textContent=`Ready. ${list.length} voice(s) available on this device.`
-}
-document.getElementById('play').addEventListener('click',()=>{if(!synth){statusEl.textContent='Sorry, this browser does not support speech synthesis. Try an updated Chrome or Edge browser.';return}
- const value=textEl.value.trim();if(!value){statusEl.textContent='Please enter some text first.';textEl.focus();return}
- synth.cancel();const utter=new SpeechSynthesisUtterance(value);const v=voices.find(x=>x.name===voiceEl.value);if(v)utter.voice=v;utter.rate=Number(rateEl.value);utter.pitch=Number(pitchEl.value);
- utter.onstart=()=>statusEl.textContent='Speaking…';utter.onend=()=>statusEl.textContent='Finished speaking.';utter.onerror=e=>statusEl.textContent='Speech error: '+e.error+'. Try another voice or browser.';synth.speak(utter)});
-document.getElementById('pause').addEventListener('click',()=>{if(synth&&synth.speaking){synth.pause();statusEl.textContent='Speech paused.'}});
-document.getElementById('resume').addEventListener('click',()=>{if(synth&&synth.paused){synth.resume();statusEl.textContent='Speech resumed.'}});
-document.getElementById('stop').addEventListener('click',()=>{if(synth)synth.cancel();statusEl.textContent='Speech stopped.'});
-rateEl.addEventListener('input',()=>document.getElementById('rateValue').textContent=Number(rateEl.value).toFixed(1)+'×');
-pitchEl.addEventListener('input',()=>document.getElementById('pitchValue').textContent=Number(pitchEl.value).toFixed(1)+'×');
-textEl.addEventListener('input',count);filterEl.addEventListener('change',populate);
-if(synth){populate();if('onvoiceschanged' in synth)synth.onvoiceschanged=populate}else{statusEl.textContent='This browser does not support speech synthesis.'}
-count();
-</script>
-</body>
-</html>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#141c31;--muted:#aab6d3;--accent:#7c8cff;--line:#2b3653}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#1b2750,#0b1020 55%);font:16px/1.5 system-ui,Segoe UI,sans-serif;color:#f4f6ff;min-height:100vh}.wrap{max-width:850px;margin:auto;padding:36px 18px}.card{background:#141c31eF;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 18px 60px #0005}h1{margin:0 0 8px;font-size:clamp(28px,5vw,42px)}p{color:var(--muted)}label{display:block;margin:18px 0 7px;font-weight:650}textarea,select,input{width:100%;background:#0b1225;color:#fff;border:1px solid #354363;border-radius:10px;padding:12px;font:inherit}textarea{min-height:170px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}button{border:0;border-radius:11px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;background:var(--accent);color:#08102c}button.secondary{background:#273454;color:#fff}button:disabled{opacity:.55;cursor:wait}audio{width:100%;margin-top:20px}.small{font-size:13px;color:#9ba9ca}.status{margin-top:15px;white-space:pre-wrap;color:#dbe3ff}.foot{font-size:12px;color:#91a0c4;margin-top:20px}a{color:#b9c5ff}
+</style></head>
+<body><main class="wrap"><section class="card">
+<h1>OFSS AI Studio</h1><p>Turn your text into natural-sounding speech and download it as an MP3.</p>
+<label for="text">Text to convert</label><textarea id="text" maxlength="3000" placeholder="Type or paste your text here (up to 3,000 characters)…"></textarea><div class="small"><span id="count">0</span>/3000 characters</div>
+<div class="grid"><div><label for="voice">Voice</label><select id="voice"><optgroup label="English (United States)"><option value="en-US-AriaNeural">Aria — Female</option><option value="en-US-JennyNeural">Jenny — Female</option><option value="en-US-GuyNeural">Guy — Male</option><option value="en-US-ChristopherNeural">Christopher — Male</option></optgroup><optgroup label="English (United Kingdom)"><option value="en-GB-SoniaNeural">Sonia — Female</option><option value="en-GB-RyanNeural">Ryan — Male</option></optgroup><optgroup label="Hindi (India)"><option value="hi-IN-SwaraNeural">Swara — Female</option><option value="hi-IN-MadhurNeural">Madhur — Male</option></optgroup></select></div><div><label for="rate">Speaking speed</label><select id="rate"><option value="-15%">Slow</option><option value="+0%" selected>Normal</option><option value="+15%">Fast</option><option value="+25%">Very fast</option></select></div></div>
+<label for="backend">TTS backend URL</label><input id="backend" type="url" value="https://ofss-ai-studio.onrender.com" placeholder="https://your-service.onrender.com"><div class="buttons"><button id="generate">Generate MP3</button><button id="download" class="secondary" disabled>Download MP3</button></div><div id="status" class="status" role="status"></div><audio id="audio" controls hidden></audio><div class="foot">Free community-powered voice service; availability and speed may vary. Avoid entering confidential or sensitive text. Your text is sent to the selected backend for speech generation.</div>
+</section></main><script>
+const textEl=document.getElementById('text'),count=document.getElementById('count'),voice=document.getElementById('voice'),rate=document.getElementById('rate'),backend=document.getElementById('backend'),generate=document.getElementById('generate'),download=document.getElementById('download'),status=document.getElementById('status'),audio=document.getElementById('audio');let blobUrl='';textEl.addEventListener('input',()=>count.textContent=textEl.value.length);generate.addEventListener('click',async()=>{const text=textEl.value.trim();if(!text){status.textContent='Please enter some text first.';return}if(text.length>3000){status.textContent='Please keep the text within 3,000 characters.';return}const base=backend.value.trim().replace(/\/$/,'');if(!base){status.textContent='Please enter your backend URL.';return}generate.disabled=true;download.disabled=true;status.textContent='Generating MP3… The free backend may take a little time to wake up.';audio.hidden=true;try{const response=await fetch(base+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:voice.value,rate:rate.value})});if(!response.ok){let message='Request failed ('+response.status+').';try{const data=await response.json();message=data.detail||data.message||message}catch{}throw new Error(message)}const blob=await response.blob();if(!blob.size)throw new Error('The server returned an empty audio file.');if(blobUrl)URL.revokeObjectURL(blobUrl);blobUrl=URL.createObjectURL(blob);audio.src=blobUrl;audio.hidden=false;download.disabled=false;status.textContent='MP3 generated successfully. Listen below or download it.';download.onclick=()=>{const a=document.createElement('a');a.href=blobUrl;a.download='ofss-ai-studio.mp3';document.body.appendChild(a);a.click();a.remove()}}catch(e){status.textContent='Could not generate audio: '+e.message+'\nPlease try again in a minute. If this continues, check that the backend is Live.'}finally{generate.disabled=false}});
+</script></body></html>
