@@ -1,16 +1,172 @@
+
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OFSS AI Studio — Text to Speech</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1020;--panel:#141c31;--muted:#aab6d3;--accent:#7c8cff;--line:#2b3653}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#1b2750,#0b1020 55%);font:16px/1.5 system-ui,Segoe UI,sans-serif;color:#f4f6ff;min-height:100vh}.wrap{max-width:850px;margin:auto;padding:36px 18px}.card{background:#141c31eF;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 18px 60px #0005}h1{margin:0 0 8px;font-size:clamp(28px,5vw,42px)}p{color:var(--muted)}label{display:block;margin:18px 0 7px;font-weight:650}textarea,select,input{width:100%;background:#0b1225;color:#fff;border:1px solid #354363;border-radius:10px;padding:12px;font:inherit}textarea{min-height:170px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}button{border:0;border-radius:11px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;background:var(--accent);color:#08102c}button.secondary{background:#273454;color:#fff}button:disabled{opacity:.55;cursor:wait}audio{width:100%;margin-top:20px}.small{font-size:13px;color:#9ba9ca}.status{margin-top:15px;white-space:pre-wrap;color:#dbe3ff}.foot{font-size:12px;color:#91a0c4;margin-top:20px}a{color:#b9c5ff}
-</style></head>
-<body><main class="wrap"><section class="card">
-<h1>OFSS AI Studio</h1><p>Turn your text into natural-sounding speech and download it as an MP3.</p>
-<label for="text">Text to convert</label><textarea id="text" maxlength="3000" placeholder="Type or paste your text here (up to 3,000 characters)…"></textarea><div class="small"><span id="count">0</span>/3000 characters</div>
-<div class="grid"><div><label for="voice">Voice</label><select id="voice"><optgroup label="English (United States)"><option value="en-US-AriaNeural">Aria — Female</option><option value="en-US-JennyNeural">Jenny — Female</option><option value="en-US-GuyNeural">Guy — Male</option><option value="en-US-ChristopherNeural">Christopher — Male</option></optgroup><optgroup label="English (United Kingdom)"><option value="en-GB-SoniaNeural">Sonia — Female</option><option value="en-GB-RyanNeural">Ryan — Male</option></optgroup><optgroup label="Hindi (India)"><option value="hi-IN-SwaraNeural">Swara — Female</option><option value="hi-IN-MadhurNeural">Madhur — Male</option></optgroup></select></div><div><label for="rate">Speaking speed</label><select id="rate"><option value="-15%">Slow</option><option value="+0%" selected>Normal</option><option value="+15%">Fast</option><option value="+25%">Very fast</option></select></div></div>
-<label for="backend">TTS backend URL</label><input id="backend" type="url" value="https://ofss-ai-studio.onrender.com" placeholder="https://your-service.onrender.com"><div class="buttons"><button id="generate">Generate MP3</button><button id="download" class="secondary" disabled>Download MP3</button></div><div id="status" class="status" role="status"></div><audio id="audio" controls hidden></audio><div class="foot">Free community-powered voice service; availability and speed may vary. Avoid entering confidential or sensitive text. Your text is sent to the selected backend for speech generation.</div>
-</section></main><script>
-const textEl=document.getElementById('text'),count=document.getElementById('count'),voice=document.getElementById('voice'),rate=document.getElementById('rate'),backend=document.getElementById('backend'),generate=document.getElementById('generate'),download=document.getElementById('download'),status=document.getElementById('status'),audio=document.getElementById('audio');let blobUrl='';textEl.addEventListener('input',()=>count.textContent=textEl.value.length);generate.addEventListener('click',async()=>{const text=textEl.value.trim();if(!text){status.textContent='Please enter some text first.';return}if(text.length>3000){status.textContent='Please keep the text within 3,000 characters.';return}const base=backend.value.trim().replace(/\/$/,'');if(!base){status.textContent='Please enter your backend URL.';return}generate.disabled=true;download.disabled=true;status.textContent='Generating MP3… The free backend may take a little time to wake up.';audio.hidden=true;try{const response=await fetch(base+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:voice.value,rate:rate.value})});if(!response.ok){let message='Request failed ('+response.status+').';try{const data=await response.json();message=data.detail||data.message||message}catch{}throw new Error(message)}const blob=await response.blob();if(!blob.size)throw new Error('The server returned an empty audio file.');if(blobUrl)URL.revokeObjectURL(blobUrl);blobUrl=URL.createObjectURL(blob);audio.src=blobUrl;audio.hidden=false;download.disabled=false;status.textContent='MP3 generated successfully. Listen below or download it.';download.onclick=()=>{const a=document.createElement('a');a.href=blobUrl;a.download='ofss-ai-studio.mp3';document.body.appendChild(a);a.click();a.remove()}}catch(e){status.textContent='Could not generate audio: '+e.message+'\nPlease try again in a minute. If this continues, check that the backend is Live.'}finally{generate.disabled=false}});
-</script></body></html>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#141c31;--muted:#aab6d3;--accent:#7c8cff;--line:#2b3653}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#1b2750,#0b1020 55%);font:16px/1.5 system-ui,Segoe UI,sans-serif;color:#f4f6ff;min-height:100vh}
+.wrap{max-width:850px;margin:auto;padding:36px 18px}
+.card{background:#141c31ef;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 18px 60px #0005}
+h1{margin:0 0 8px;font-size:clamp(28px,5vw,42px)}
+p{color:var(--muted)}
+label{display:block;margin:18px 0 7px;font-weight:650}
+textarea,select,input{width:100%;background:#0b1225;color:#fff;border:1px solid #354363;border-radius:10px;padding:12px;font:inherit}
+textarea{min-height:220px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+button{border:0;border-radius:11px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;background:var(--accent);color:#08102c}
+button.secondary{background:#273454;color:#fff}
+button:disabled{opacity:.55;cursor:wait}
+audio{width:100%;margin-top:20px}
+.small{font-size:13px;color:#9ba9ca}
+.status{margin-top:15px;white-space:pre-wrap;color:#dbe3ff}
+.foot{font-size:12px;color:#91a0c4;margin-top:20px}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="card">
+<h1>OFSS AI Studio</h1>
+<p>Turn your text into natural-sounding speech and download it as an MP3.</p>
+
+<label for="text">Text to convert</label>
+<textarea id="text" maxlength="50000" placeholder="Type or paste your text here (up to 50,000 characters)…"></textarea>
+<div class="small"><span id="count">0</span>/50000 characters</div>
+
+<div class="grid">
+<div>
+<label for="voice">Voice</label>
+<select id="voice">
+<optgroup label="English (United States)">
+<option value="en-US-AriaNeural">Aria — Female</option>
+<option value="en-US-JennyNeural">Jenny — Female</option>
+<option value="en-US-GuyNeural">Guy — Male</option>
+<option value="en-US-ChristopherNeural">Christopher — Male</option>
+</optgroup>
+<optgroup label="English (United Kingdom)">
+<option value="en-GB-SoniaNeural">Sonia — Female</option>
+<option value="en-GB-RyanNeural">Ryan — Male</option>
+</optgroup>
+<optgroup label="Hindi (India)">
+<option value="hi-IN-SwaraNeural">Swara — Female</option>
+<option value="hi-IN-MadhurNeural">Madhur — Male</option>
+</optgroup>
+</select>
+</div>
+<div>
+<label for="rate">Speaking speed</label>
+<select id="rate">
+<option value="-10%">Slow</option>
+<option value="+0%" selected>Normal</option>
+<option value="+10%">Fast</option>
+<option value="+20%">Very fast</option>
+</select>
+</div>
+</div>
+
+<label for="backend">TTS backend URL</label>
+<input id="backend" type="url" value="https://ofss-ai-studio.onrender.com" placeholder="https://your-service.onrender.com">
+
+<div class="buttons">
+<button id="generate">Generate MP3</button>
+<button id="download" class="secondary" disabled>Download MP3</button>
+</div>
+
+<div id="status" class="status" role="status"></div>
+<audio id="audio" controls hidden></audio>
+<div class="foot">Free community-powered voice service; availability and speed may vary. Avoid entering confidential or sensitive text. Your text is sent to the selected backend for speech generation.</div>
+</section>
+</main>
+
+<script>
+const textEl=document.getElementById('text');
+const count=document.getElementById('count');
+const voice=document.getElementById('voice');
+const rate=document.getElementById('rate');
+const backend=document.getElementById('backend');
+const generate=document.getElementById('generate');
+const download=document.getElementById('download');
+const status=document.getElementById('status');
+const audio=document.getElementById('audio');
+let blobUrl='';
+
+textEl.addEventListener('input',()=>{
+  count.textContent=textEl.value.length;
+});
+
+generate.addEventListener('click',async()=>{
+  const text=textEl.value.trim();
+
+  if(!text){
+    status.textContent='Please enter some text first.';
+    return;
+  }
+
+  if(text.length>50000){
+    status.textContent='Please keep the text within 50,000 characters.';
+    return;
+  }
+
+  const base=backend.value.trim().replace(/\/$/,'');
+  if(!base){
+    status.textContent='Please enter your backend URL.';
+    return;
+  }
+
+  generate.disabled=true;
+  download.disabled=true;
+  status.textContent='Generating MP3… Long text may take several minutes. Please keep this page open.';
+  audio.hidden=true;
+
+  try{
+    const response=await fetch(base+'/api/tts',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        text,
+        voice:voice.value,
+        rate:rate.value
+      })
+    });
+
+    if(!response.ok){
+      let message='Request failed ('+response.status+').';
+      try{
+        const data=await response.json();
+        message=data.detail||data.message||message;
+      }catch{}
+      throw new Error(message);
+    }
+
+    const blob=await response.blob();
+    if(!blob.size)throw new Error('The server returned an empty audio file.');
+
+    if(blobUrl)URL.revokeObjectURL(blobUrl);
+    blobUrl=URL.createObjectURL(blob);
+    audio.src=blobUrl;
+    audio.hidden=false;
+    download.disabled=false;
+    status.textContent='MP3 generated successfully. Listen below or download it.';
+
+    download.onclick=()=>{
+      const a=document.createElement('a');
+      a.href=blobUrl;
+      a.download='ofss-ai-studio.mp3';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+  }catch(e){
+    status.textContent='Could not generate audio: '+e.message+
+      '\nPlease try again. If this continues, check that the backend is Live.';
+  }finally{
+    generate.disabled=false;
+  }
+});
+</script>
+</body>
+</html>
