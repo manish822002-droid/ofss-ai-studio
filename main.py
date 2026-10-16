@@ -1,6 +1,5 @@
 
 import os
-import re
 import time
 import tempfile
 from collections import defaultdict, deque
@@ -9,7 +8,7 @@ from pathlib import Path
 import edge_tts
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
 
@@ -42,10 +41,12 @@ WINDOW_SECONDS = 60
 MAX_REQUESTS_PER_MINUTE = 8
 CHUNK_SIZE = 2800
 
+
 class TTSRequest(BaseModel):
     text: str = Field(min_length=1, max_length=50000)
     voice: str = "en-US-AriaNeural"
     rate: str = "+0%"
+
 
 def split_text(text):
     text = text.strip()
@@ -74,17 +75,24 @@ def split_text(text):
 
     return chunks
 
-@app.get("/")
+
+@app.get("/", response_class=HTMLResponse)
 async def home():
-    return {
-        "service": "OFSS AI Studio TTS API",
-        "status": "ok",
-        "endpoint": "/api/tts",
-    }
+    html_path = Path(__file__).parent / "index.html"
+
+    if not html_path.exists():
+        raise HTTPException(
+            status_code=500,
+            detail="index.html file not found",
+        )
+
+    return FileResponse(html_path, media_type="text/html")
+
 
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
 
 @app.post("/api/tts")
 async def make_tts(payload: TTSRequest, request: Request):
@@ -102,7 +110,6 @@ async def make_tts(payload: TTSRequest, request: Request):
         )
 
     q.append(now)
-
     text = payload.text.strip()
 
     if not text:
@@ -112,7 +119,10 @@ async def make_tts(payload: TTSRequest, request: Request):
         raise HTTPException(status_code=400, detail="Unsupported voice.")
 
     if payload.rate not in RATES:
-        raise HTTPException(status_code=400, detail="Unsupported speaking speed.")
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported speaking speed.",
+        )
 
     output_path = None
 
